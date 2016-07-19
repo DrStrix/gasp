@@ -44,6 +44,27 @@ exports.findById = function(id, cb) {
 })
 }
 
+//нахождение по логину
+exports.findByUsername = function(username, cb) 
+{
+ 
+  process.nextTick(function() 
+  { 
+    users.find({username:username }, function (err, docs) 
+      {
+          try {
+            if (docs[0].username === username) 
+            {   
+             cb(null, docs[0]);
+            }else{
+             cb(null, null);
+            }
+              } catch(e) {
+            cb(null, null);
+          }
+      });
+  })
+}
 
 //загрузка всего справочника 
 exports.handBook = function(cb) 

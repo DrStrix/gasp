@@ -22,29 +22,6 @@ exports.userList = function(cb)
   });
 }
 
-//загрузка всего справочника для пользователя
-exports.handBook = function(list,cb) 
-{
-  process.nextTick(function() 
-  {
-    handbook.find({header:{$in:list}}, function (err, docs) 
-    {
-          cb(null,docs);
-    });
-  })
-}
-
-//загрузка отдельной темы из справочника по id
-exports.HandbookById = function(id,cb) 
-{
-  process.nextTick(function() 
-  {
-    handbook.find({_id:id}, function (err, docs) 
-    {
-          cb(null,docs);
-    });
-  })
-}
 
 
 exports.deleteUser= function(id, cb) {
@@ -89,26 +66,24 @@ exports.findByUsername = function(username, cb)
       });
   })
 }
+
+//загрузка всего справочника 
+exports.handBook = function(cb) 
+{
+  process.nextTick(function() 
+  {
+    handbook.find({}, function (err, docs) 
+    {
+          cb(null,docs);
+    });
+  })
+}
 //добавление справочника
 exports.addhandbook = function(name, text, cb)
 {
   process.nextTick(function()
   {
     handbook.insert({ header: name, text: text, image: '0' }, function(err)
-      {
-        if(err) cb(err);
-        else cb(null);
-      }
-    );
-  });
-}
-
-//добавление теста
-exports.addtest = function(name, list, cb)
-{
-  process.nextTick(function()
-  {
-    tests.insert({name: name, list: list}, function(err)
       {
         if(err) cb(err);
         else cb(null);
@@ -130,6 +105,26 @@ exports.delhandbook = function(id, cb)
     );
   });
 }
+
+
+
+//тесты
+
+//добавление теста
+exports.addtest = function(name, list, cb)
+{
+  process.nextTick(function()
+  {
+    tests.insert({name: name, list: list}, function(err)
+      {
+        if(err) cb(err);
+        else cb(null);
+      }
+    );
+  });
+}
+
+
 
 //удаление теста
 exports.deltest = function(id, name, cb)
@@ -162,10 +157,6 @@ exports.deltest = function(id, name, cb)
       
   });
 }
-
-
-
-//тесты
 
 
 //загрузка всех тестов для пользователя

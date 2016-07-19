@@ -1,3 +1,4 @@
+tests.loadDatabase(function(err) {if(err)console.error('Ошибка загрузки базы данных тестов:'+err)  });
 var path = require('path');
 var Nedb = require('nedb')
   , users = new Nedb({ filename: 'db/users.db'})

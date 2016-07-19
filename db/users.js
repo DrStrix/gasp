@@ -147,7 +147,7 @@ exports.deltest = function(id, name, cb)
         console.log(docs);
         if(err) cb(err);
         else
-        {
+        {//ниработаит
           console.log(docs[0].testslist.name)
           users.remove({"testslist.name":docs[0].testslist.name}, function(err)
             {

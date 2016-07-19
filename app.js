@@ -5,7 +5,7 @@ var db = require('./db');
 
 passport.use(new Strategy(
   function(username, password, cb) {
-      db.users.findByUsername(username, function(err, user) {
+      db.findByUsername(username, function(err, user) {
 
       if (err) { return cb(err); }
       if (!user) { return cb(null, false); }
@@ -15,16 +15,13 @@ passport.use(new Strategy(
     });
   }));
 
-
-
-
 passport.serializeUser(function(user, cb) {
   cb(null, user._id);
 });
 
 
 passport.deserializeUser(function(id, cb) {
-  db.users.findById(id, function (err, user) {
+  db.findById(id, function (err, user) {
     if (err) { return cb(err); }
     cb(null, user);
   });
@@ -49,21 +46,26 @@ app.use(passport.session());
 
 
 // API для приложения
-//проверка логина
+//аудентификация пользователя
 app.post('/api/login', 
   passport.authenticate('local'),
   function(req, res) {
   	res.status('200');
   	res.end();
-    //res.redirect('/');
   });
 
-//получение всего справочника для пользователя
+//выход пользователя
+app.post('/api/logout',
+  function(req, res){
+    req.logout();
+    res.end();
+  });
+
+
+//получение всего справочника
 app.post('/api/handbook', 
-
   function(req, res) {
-
-  	 	db.users.handBook(function (err, handbook) {	
+  	 	db.handBook(function (err, handbook) {	
   		res.write(JSON.stringify(handbook))
   		res.end();
   	});
@@ -72,12 +74,11 @@ app.post('/api/handbook',
 
 //получение всех пользователей для админа
 app.post('/api/list', 
-  passport.authenticate('local'),
   function(req, res) 
   {
   	try{
   		req.user.role=='admin'
-  	 	db.users.userList( function (err, userList) 
+  	 	db.userList( function (err, userList) 
   	 	{
   		res.write(JSON.stringify(userList))
   		res.end();
@@ -88,12 +89,11 @@ app.post('/api/list',
 
 //получение тестов для пользователя
 app.post('/api/testslist', 
-  passport.authenticate('local'),
   function(req, res) {
   	var list =req.user.testslist.map(function(data) 
   	{return data.name;	})
 
-  	 	db.users.tests(list, function (err, testslist) {	
+  	 	db.tests(list, function (err, testslist) {	
   		res.write(JSON.stringify(testslist))
   		res.end();
   	});
@@ -102,75 +102,16 @@ app.post('/api/testslist',
 
 //получение списка тестов и оценки
 app.post('/api/tests', 
-  passport.authenticate('local'),
   function(req, res) {
   		res.write(JSON.stringify(req.user.testslist))
   		res.end();
   });
 
-
-
-  		//db.users.userList( function (err, userList) {res.write(userList)
-
-// Define routes.
-app.get('/',
-  function(req, res) {
-  	try {
-
-  		  		if(req.user==undefined)
-  			res.redirect('/login');
-  		req.user.role=='admin';
-  		res.render('home', { user: req.user,role:req.user.role });
-
-  	}
-  	catch(e){res.render('home', { user: req.user });}
-  });
-
-app.get('/login',  function(req, res){    res.render('login');  });
-
-app.get('/admin',  function(req, res)  { 	
-  	try {
-  		req.user.role=='admin';
-  		db.users.userList( function (err, userList) {
-res.render('admin', { user: req.user, userList:userList})
-  });
-  		
-  		} catch(e) {
-  					res.render('login');
-  					}
-  });
-
-
-  app.post('/admin', 
-  function(req, res) {
-  	try {
-  		req.user.role=='admin';
-  		var query=Object.keys(req.body);
-  		if(query[1]=='Удалить' && req.user.id!=query[0])
-  		db.users.deleteUser(query[0]);
-  		}
-  		catch(e) {
-  					res.render('login');
-  				}
-    res.redirect('/admin');
-  });
-app.get('/logout',
-  function(req, res){
-    req.logout();
-    res.redirect('/');
-  });
-
-app.get('/profile',
-  require('connect-ensure-login').ensureLoggedIn(),
-  function(req, res){
-  	
-    res.render('profile', { user: req.user });
-  });
+  		//db.userList( function (err, userList) {res.write(userList)
 
 app.post('/api/handBook/addHandBook',
-	passport.authenticate('local'),
 	function(req,res){
-		db.users.addhandbook(req.body.name, req.body.text, function(err){
+		db.addhandbook(req.body.name, req.body.text, function(err){
 			if(err==null)
 			 res.status(200);
 			else res.status(409);
@@ -179,9 +120,8 @@ app.post('/api/handBook/addHandBook',
 	});
 
 app.post('/api/tests/addTest',
-	passport.authenticate('local'),
 	function(req,res){
-		db.users.addtest(req.body.name, req.body.list, function(err){
+		db.addtest(req.body.name, req.body.list, function(err){
 			if(err==null)
 			 res.status(200);
 			else res.status(409);
@@ -190,9 +130,8 @@ app.post('/api/tests/addTest',
 	});
 
 app.post('/api/handBook/delHandBook',
-	passport.authenticate('local'),
 	function(req,res){
-		db.users.delhandbook(req.body.id, function(err){
+		db.delhandbook(req.body.id, function(err){
 			if(err==null)
 			 res.status(200);
 			else res.status(409);
@@ -201,17 +140,13 @@ app.post('/api/handBook/delHandBook',
 	});
 
 app.post('/api/tests/delTest',
-	passport.authenticate('local'),
 	function(req,res){
-		db.users.deltest(req.body.id, req.body.name, function(err){
+		db.deltest(req.body.id, req.body.name, function(err){
 			if(err==null)
 			 res.status(200);
 			else res.status(409);
 			res.end();
 		});
 	});
-
-
-
 app.use(express.static(__dirname + '/static'));
 app.listen(process.env.OPENSHIFT_NODEJS_PORT || 8080,process.env.OPENSHIFT_NODEJS_IP);

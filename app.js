@@ -19,7 +19,6 @@ passport.serializeUser(function(user, cb) {
   cb(null, user._id);
 });
 
-
 passport.deserializeUser(function(id, cb) {
   db.findById(id, function (err, user) {
     if (err) { return cb(err); }
@@ -28,20 +27,15 @@ passport.deserializeUser(function(id, cb) {
 });
 var app = express();
 
-// Configure view engine to render EJS templates.
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
-// Use application-level middleware for common functionality, including
 // logging, parsing, and session handling.
 app.use(require('morgan')('short'));
-app.use(require('cookie-parser')());
+
 app.use(require('body-parser').urlencoded({ extended: true }));
-app.use(require('express-session')({ secret: 'rt32.%23_g54!', resave: false, saveUninitialized: false }));
+
 
 // Initialize Passport and restore authentication state, if any, from the
 // session.
 app.use(passport.initialize());
-app.use(passport.session());
 
 
 
@@ -61,7 +55,6 @@ app.post('/api/logout',
     res.end();
   });
 
-
 //получение всего справочника
 app.post('/api/handbook', 
   function(req, res) {
@@ -71,9 +64,9 @@ app.post('/api/handbook',
   	});
   });
 
-
 //получение всех пользователей для админа
 app.post('/api/list', 
+		passport.authenticate('local'),
   function(req, res) 
   {
   	try{
@@ -89,6 +82,7 @@ app.post('/api/list',
 
 //получение тестов для пользователя
 app.post('/api/testslist', 
+		passport.authenticate('local'),
   function(req, res) {
   	var list =req.user.testslist.map(function(data) 
   	{return data.name;	})
@@ -102,6 +96,7 @@ app.post('/api/testslist',
 
 //получение списка тестов и оценки
 app.post('/api/tests', 
+	passport.authenticate('local'),
   function(req, res) {
   		res.write(JSON.stringify(req.user.testslist))
   		res.end();
@@ -110,6 +105,7 @@ app.post('/api/tests',
   		//db.userList( function (err, userList) {res.write(userList)
 
 app.post('/api/handBook/addHandBook',
+		passport.authenticate('local'),
 	function(req,res){
 		db.addhandbook(req.body.name, req.body.text, function(err){
 			if(err==null)
@@ -120,6 +116,7 @@ app.post('/api/handBook/addHandBook',
 	});
 
 app.post('/api/tests/addTest',
+		passport.authenticate('local'),
 	function(req,res){
 		db.addtest(req.body.name, req.body.list, function(err){
 			if(err==null)
@@ -130,6 +127,7 @@ app.post('/api/tests/addTest',
 	});
 
 app.post('/api/handBook/delHandBook',
+		passport.authenticate('local'),
 	function(req,res){
 		db.delhandbook(req.body.id, function(err){
 			if(err==null)
@@ -140,6 +138,7 @@ app.post('/api/handBook/delHandBook',
 	});
 
 app.post('/api/tests/delTest',
+		passport.authenticate('local'),
 	function(req,res){
 		db.deltest(req.body.id, req.body.name, function(err){
 			if(err==null)

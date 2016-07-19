@@ -1,0 +1,6 @@
+<link href="/css.css" rel="stylesheet" type="text/css">
+<%- include('header' ) %>
+	<p>Hello, <%= user.username %>. View your <a href="/profile">profile</a>.</p>
+	<% if (role=="admin") { %>
+	<p> Пользователи: <a href="/admin">Пользователи</a>.</p>
+<% } %>

@@ -60,29 +60,15 @@ app.post('/api/login',
 
 //получение всего справочника для пользователя
 app.post('/api/handbook', 
-  passport.authenticate('local'),
+
   function(req, res) {
 
-  	 	db.users.handBook(req.user.handBookList, function (err, userList) {	
-  		res.write(JSON.stringify(userList))
+  	 	db.users.handBook(function (err, handbook) {	
+  		res.write(JSON.stringify(handbook))
   		res.end();
   	});
   });
 
-//полчение отдельной темы из справочника
-app.post('/api/handbook/get', 
-  passport.authenticate('local'),
-  function(req, res) {
-  		db.users.HandbookById(req.body.id, function (err, data) 
-  		{	
-  			if(data.length==0)
-  				{res.status(204); res.end()}
-  			else
-  			{
-  		res.end(JSON.stringify(data))
-  			}
-  		})
-  	});
 
 //получение всех пользователей для админа
 app.post('/api/list', 

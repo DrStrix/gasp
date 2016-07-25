@@ -84,10 +84,7 @@ app.post('/api/list',
 app.post('/api/testslist', 
 		passport.authenticate('local'),
   function(req, res) {
-  	var list =req.user.testslist.map(function(data) 
-  	{return data.name;	})
-
-  	 	db.tests(list, function (err, testslist) {	
+  	 	db.tests( function (err, testslist) {	
   		res.write(JSON.stringify(testslist))
   		res.end();
   	});
@@ -158,18 +155,19 @@ app.post('/api/tests/prohodTest',
 			res.end();
 		});
 	});
-/*
+
 app.post('/api/tests/provTest',
 		passport.authenticate('local'),
 	function(req,res){
-		db.provtests(req.user.id,req.body.id,  function(err){
-			if(err==null)
-			 res.status(200);
+		db.provtests(req.user._id,req.body.id,  function(err,t){
+			if(err==null){
+			res.write(t);
+			 res.status(200);}
 			else res.status(409);
 			res.end();
 		});
 	});
-*/
+
 
 app.use(express.static(__dirname + '/static'));
 app.listen(process.env.OPENSHIFT_NODEJS_PORT || 8080,process.env.OPENSHIFT_NODEJS_IP);

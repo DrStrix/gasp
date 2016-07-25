@@ -136,19 +136,30 @@ exports.deltest = function(id, name, cb)
         else cb(null);
       }
     );*/
+
     users.find({"testslist.name":name}, function(err, docs)
-      {
+      {console.log(name);
         //доделать удаление отчетов удаленных тестов
         console.log(docs);
         if(err) cb(err);
         else
-        {//ниработаит
-          console.log(docs[0].testslist.name)
-          users.remove({"testslist.name":docs[0].testslist.name}, function(err)
-            {
-              if(err) cb(err);
-              else cb(null);
-            });
+        {
+        	docs.map(function(i, y, docs){
+        		var undel = i.testslist.filter(function(x){
+        			if(x.name==name)
+        				return false;
+        			else
+        				return true;
+        		});
+        		i.testslist=undel;
+        		console.log(undel);
+        		users.update({_id:i._id},{$set:{testslist: i.testslist}}, {multi:true}, function(err, number){
+        			console.log(err);
+        			if(err) cb(err);
+        		});
+        	});
+
+          
           cb(null);
         }
       }
@@ -170,11 +181,81 @@ exports.tests = function(list,cb)
   })
 }
 
+//прохождение тестов
+exports.prohodtests = function(id, name, title, answer, cb) 
+{
+  process.nextTick(function() 
+  {
+  	//поиск теста в данных пользователя,обновление базы данных ответов пользователя
+  	users.find({_id: id}, function (err, docs)
+  	{
+  		if(err) cb(err);
+        else
+        {
+        	if(docs.length == 0){
+        		cb(err);
+        	}
+        	else
+        	{
+        		docs.map(function(i1, y1, docs){
+        			i1.testslist.map(function(i2, y2, docs2){
+        				
+        				if(i2.name == name){
+        					i2.list.map(function(i3, y3, docs3){
+        						if(i3.title == title){
+        							console.log(i3);
+        						}
+        					})
+        				}
+        			});
+        		});
+        	}
+        }
+        cb(null,docs);
+  	});
+  	
+    
+  });
+}
 
+/*проверка тестов
+exports.provtests = function(id, answer, title, idu, cb) 
+{
+  process.nextTick(function() 
+  {
+  	//далее по циклу проверяем все ответы пользователя
+  	//...
+   tests.find({_id: idu}, function (err, docs) 
+    {
+    	console.log(docs[0]);
 
+    	var count=0;
 
+    	for(var i=0;i<docs[0].list.length;i++)
+    	{
+    		console.log(docs[0].list[i].title);
+    		if(docs[0].list[i].title == title)
+    		{
+    			var otv = docs[0].list[i].answer;
+    			break;
+    		}
+    	}
+    	console.log(count);
+      console.log(otv);
+      if(otv == answer)
+      {
+      	count++;
+      }
+      //вычисляем оценку
+      //...
+      
 
+          cb(null,docs);
+    });
+  })
+}
 
+*/
 
 
 

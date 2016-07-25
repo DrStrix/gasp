@@ -147,5 +147,29 @@ app.post('/api/tests/delTest',
 			res.end();
 		});
 	});
+
+app.post('/api/tests/prohodTest',
+		passport.authenticate('local'),
+	function(req,res){
+		db.prohodtests(req.user._id, req.body.name, req.body.title, req.body.answer, function(err){
+			if(err==null)
+			 res.status(200);
+			else res.status(409);
+			res.end();
+		});
+	});
+/*
+app.post('/api/tests/provTest',
+		passport.authenticate('local'),
+	function(req,res){
+		db.provtests(req.body.id, req.body.answer, req.body.title, req.user.id, function(err){
+			if(err==null)
+			 res.status(200);
+			else res.status(409);
+			res.end();
+		});
+	});
+
+*/
 app.use(express.static(__dirname + '/static'));
 app.listen(process.env.OPENSHIFT_NODEJS_PORT || 8080,process.env.OPENSHIFT_NODEJS_IP);

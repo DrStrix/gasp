@@ -197,17 +197,26 @@ exports.prohodtests = function(id, name, title, answer, cb)
         	}
         	else
         	{
+            var y=0;
         		docs.map(function(i1, y1, docs){
-        			i1.testslist.map(function(i2, y2, docs2){
-        				
-        				if(i2.name == name){
-        					i2.list.map(function(i3, y3, docs3){
-        						if(i3.title == title){
-        							console.log(i3);
-        						}
-        					})
-        				}
-        			});
+        		i1.testslist.map(function(i2, y2, docs2){
+
+        			if(i2.name == name){
+                y=1;
+        				i2.list.map(function(i3, y3, docs3){
+        					if(i3.title == title){
+                    y=2;
+                    i3.answer=answer
+                    users.update({_id:docs[0]._id},{ $set: {testslist:docs[0].testslist}})
+        					}
+        				})
+                if(y==1) {
+                    if(i2.name==name) {i2.list.push({title:title,answer:answer})
+                      users.update({_id:docs[0]._id},{ $set: {testslist:docs[0].testslist}})
+                  }}
+                                }});
+              if(y==0) users.update({_id:docs[0]._id},{ $push: {testslist:{name:name,list:[{title:title,answer:answer}],value:''}}},function(err)
+                {if(err)cb(err)})
         		});
         	}
         }
@@ -218,8 +227,9 @@ exports.prohodtests = function(id, name, title, answer, cb)
   });
 }
 
-/*проверка тестов
-exports.provtests = function(id, answer, title, idu, cb) 
+//проверка тестов
+/*
+exports.provtests = function(id, idTest, cb) 
 {
   process.nextTick(function() 
   {
@@ -254,8 +264,8 @@ exports.provtests = function(id, answer, title, idu, cb)
     });
   })
 }
-
 */
+
 
 
 

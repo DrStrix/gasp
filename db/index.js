@@ -152,8 +152,9 @@ exports.deltest = function(id, name, cb)
         				return true;
         		});
         		i.testslist=undel;
-
+        		console.log(undel);
         		users.update({_id:i._id},{$set:{testslist: i.testslist}}, {multi:true}, function(err, number){
+        			console.log(err);
         			if(err) cb(err);
         		});
         	});
@@ -169,11 +170,11 @@ exports.deltest = function(id, name, cb)
 
 
 //загрузка всех тестов для пользователя
-exports.tests = function(cb) 
+exports.tests = function(list,cb) 
 {
   process.nextTick(function() 
   {
-    tests.find({}, function (err, docs) 
+    tests.find({name:{$in:list}}, function (err, docs) 
     {
           cb(null,docs);
     });
@@ -227,51 +228,15 @@ exports.prohodtests = function(id, name, title, answer, cb)
 }
 
 //проверка тестов
-
+/*
 exports.provtests = function(id, idTest, cb) 
 {
   process.nextTick(function() 
   {
-    var t=0;
-    var ti=0;
-   users.find({_id: id}, function (err, docs) 
+  	//далее по циклу проверяем все ответы пользователя
+  	//...
+   tests.find({_id: idu}, function (err, docs) 
     {
-      tests.find({_id:idTest},function (err1, docst)
-      {
-        
-        docs[0].testslist.map(function(i,y,d){
-          if(i.name==docst[0].name){
-
-              t=0;
-              ti=0;
-            for(var ii=0;ii!=docst[0].list.length;ii++)
-            {
-              ti++;
-
-              if(docst[0].list[ii].answer==i.list[ii].answer)
-                t++;
-                            console.log(docst[0].list[ii].answer);console.log(i.list[ii].answer);
-            }
-
-            
-            i.value=(t/ti).toFixed(2);
-
-            t=i.value;
-
-          }
-        })
-
-
-        users.update({_id: id},{$set: {testslist:docs[0].testslist}})
-        //console.log(t)
-        cb(err,t);
-
-      })
-    })
-  })
-}
-/*
-
     	console.log(docs[0]);
 
     	var count=0;
@@ -299,8 +264,8 @@ exports.provtests = function(id, idTest, cb)
     });
   })
 }
-
 */
+
 
 
 
